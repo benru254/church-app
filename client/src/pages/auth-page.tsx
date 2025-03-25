@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import {
   Card,
@@ -12,12 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { insertUserSchema } from "@shared/schema";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Extend the insert schema for login
 const loginSchema = z.object({
@@ -38,15 +38,9 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
-
-  // Redirect if user is already logged in
-  useEffect(() => {
-    if (user) {
-      setLocation("/");
-    }
-  }, [user, setLocation]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -71,16 +65,30 @@ export default function AuthPage() {
   });
 
   const onLoginSubmit = (data: LoginFormValues) => {
-    loginMutation.mutate(data);
+    setIsSubmitting(true);
+    // Simulate login process
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast({
+        title: "Login successful",
+        description: "Welcome back to Grace Fellowship!",
+      });
+      setLocation("/");
+    }, 1500);
   };
 
   const onRegisterSubmit = (data: RegisterFormValues) => {
-    registerMutation.mutate(data);
+    setIsSubmitting(true);
+    // Simulate registration process
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast({
+        title: "Registration successful",
+        description: "Your account has been created. Welcome to Grace Fellowship!",
+      });
+      setLocation("/");
+    }, 1500);
   };
-
-  if (user) {
-    return null; // Will redirect in useEffect
-  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900">
@@ -130,9 +138,9 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={loginMutation.isPending}
+                      disabled={isSubmitting}
                     >
-                      {loginMutation.isPending ? (
+                      {isSubmitting && activeTab === "login" ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Signing in...
@@ -210,9 +218,9 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={registerMutation.isPending}
+                      disabled={isSubmitting}
                     >
-                      {registerMutation.isPending ? (
+                      {isSubmitting && activeTab === "register" ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Creating Account...
