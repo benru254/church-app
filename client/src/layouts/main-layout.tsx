@@ -1,23 +1,15 @@
 import { ReactNode } from "react";
-import { useLocation } from "wouter";
 import { BottomTabs } from "@/components/navigation/bottom-tabs";
 import { DrawerNavigation } from "@/components/navigation/drawer-navigation";
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 
 interface MainLayoutProps {
   children: ReactNode;
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const [location] = useLocation();
-  const { user } = useAuth();
-  
-  // Don't render the layout on the auth page
-  if (location === "/auth") {
-    return <>{children}</>;
-  }
+  // For protected pages, auth is guaranteed by ProtectedRoute in the router
 
   return (
     <div className="bg-background text-foreground min-h-screen pb-16">

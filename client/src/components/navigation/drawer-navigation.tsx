@@ -18,7 +18,6 @@ import { Toggle } from "@/components/ui/toggle";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { useAuth } from "@/hooks/use-auth";
 
 interface NavItem {
   label: string;
@@ -45,7 +44,12 @@ export function DrawerNavigation() {
   const [open, setOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [location] = useLocation();
-  const { user, logoutMutation } = useAuth();
+  
+  // Sample user data for UI development (to be replaced with real auth later)
+  const mockUser = {
+    displayName: "John Doe",
+    profilePicture: ""
+  };
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -57,8 +61,9 @@ export function DrawerNavigation() {
   };
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    // Will be implemented with authentication later
     setOpen(false);
+    window.location.href = "/auth";
   };
 
   return (
@@ -73,14 +78,14 @@ export function DrawerNavigation() {
         <DrawerHeader className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Avatar>
-              {user?.profilePicture ? (
-                <AvatarImage src={user.profilePicture} alt={user.displayName} />
+              {mockUser.profilePicture ? (
+                <AvatarImage src={mockUser.profilePicture} alt={mockUser.displayName} />
               ) : (
-                <AvatarFallback>{user?.displayName?.charAt(0) || "U"}</AvatarFallback>
+                <AvatarFallback>{mockUser.displayName.charAt(0) || "U"}</AvatarFallback>
               )}
             </Avatar>
             <div>
-              <DrawerTitle className="text-base">{user?.displayName}</DrawerTitle>
+              <DrawerTitle className="text-base">{mockUser.displayName}</DrawerTitle>
               <p className="text-xs text-muted-foreground">View Profile</p>
             </div>
           </div>
@@ -155,9 +160,8 @@ export function DrawerNavigation() {
             variant="destructive" 
             className="w-full mt-4"
             onClick={handleLogout}
-            disabled={logoutMutation.isPending}
           >
-            {logoutMutation.isPending ? "Logging out..." : "Log Out"}
+            Log Out
           </Button>
         </div>
       </DrawerContent>
