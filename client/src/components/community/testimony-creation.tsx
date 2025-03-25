@@ -5,15 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Image, Video, SmilePlus, User, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/context/user-context";
 
 export function TestimonyCreation() {
-  // Mock user data
-  const mockUser = {
-    displayName: "John Doe",
-    profilePicture: ""
-  };
-  
+  const { user, incrementActivity } = useUser();
   const { toast } = useToast();
+  
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -29,6 +26,9 @@ export function TestimonyCreation() {
       setIsAnonymous(false);
       setImageUrl(null);
       setIsSubmitting(false);
+      
+      // Update user's testimony count
+      incrementActivity('testimoniesShared');
       
       toast({
         title: "Testimony shared",
@@ -55,10 +55,10 @@ export function TestimonyCreation() {
       <CardContent className="p-4">
         <div className="flex items-center gap-3 mb-3">
           <Avatar>
-            {mockUser.profilePicture ? (
-              <AvatarImage src={mockUser.profilePicture} alt={mockUser.displayName} />
+            {user.profilePicture ? (
+              <AvatarImage src={user.profilePicture} alt={user.displayName} />
             ) : (
-              <AvatarFallback>{mockUser.displayName.charAt(0) || "U"}</AvatarFallback>
+              <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
             )}
           </Avatar>
           <div className="flex-1">

@@ -7,12 +7,13 @@ import { Heart, MessageSquare, Share, MoreVertical, HandHelping, User } from "lu
 import { Testimony } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface EnrichedTestimony extends Testimony {
+interface EnrichedTestimony extends Omit<Testimony, 'imageUrl'> {
   user?: {
     id?: number;
     displayName: string;
     profilePicture?: string;
   };
+  imageUrl: string | null; // Match the schema definition
 }
 
 export function TestimoniesFeed() {
@@ -36,6 +37,7 @@ export function TestimoniesFeed() {
       userId: 2,
       content: "After years of trying, my wife and I are finally expecting our first child. We've been praying for this blessing for so long!",
       isAnonymous: false,
+      imageUrl: null, // Set to null instead of undefined
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
       user: {
         id: 2,
@@ -48,6 +50,7 @@ export function TestimoniesFeed() {
       userId: 3, 
       content: "I lost my job during the pandemic and was struggling financially. A member of our church anonymously paid my rent for three months while I found a new job. God provides!",
       isAnonymous: true,
+      imageUrl: null, // Add the imageUrl property
       createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
       user: {
         id: 3,
