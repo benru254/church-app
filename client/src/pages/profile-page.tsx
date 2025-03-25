@@ -2,15 +2,16 @@ import { ProfileHeader } from "@/components/profile/profile-header";
 import { SavedContents } from "@/components/profile/saved-content";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
-import { Loader2, Settings, Bell, Lock, HelpCircle, LogOut } from "lucide-react";
+import { Settings, Bell, Lock, HelpCircle, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useLocation } from "wouter";
 
 export default function ProfilePage() {
-  const { logoutMutation } = useAuth();
+  const [_, setLocation] = useLocation();
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    // Simple navigation for UI testing purposes
+    setLocation("/auth");
   };
 
   return (
@@ -101,14 +102,9 @@ export default function ProfilePage() {
               variant="ghost" 
               className="w-full justify-start rounded-none py-4 px-4 h-auto text-red-500"
               onClick={handleLogout}
-              disabled={logoutMutation.isPending}
             >
-              {logoutMutation.isPending ? (
-                <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-              ) : (
-                <LogOut className="mr-3 h-5 w-5" />
-              )}
-              <span>{logoutMutation.isPending ? "Logging out..." : "Log Out"}</span>
+              <LogOut className="mr-3 h-5 w-5" />
+              <span>Log Out</span>
             </Button>
           </div>
         </CardContent>

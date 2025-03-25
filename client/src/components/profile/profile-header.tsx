@@ -2,12 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pencil } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
 
 export function ProfileHeader() {
-  const { user } = useAuth();
-  
-  if (!user) return null;
+  // Mock user data for UI development
+  const mockUser = {
+    displayName: "John Doe",
+    profilePicture: ""
+  };
 
   // In a real app, we'd calculate this from the user's createdAt field
   const memberSince = "January 2022";
@@ -17,15 +18,15 @@ export function ProfileHeader() {
       <div className="flex flex-col items-center text-center mb-6">
         <div className="relative mb-3">
           <Avatar className="w-24 h-24 border-4 border-background">
-            {user.profilePicture ? (
+            {mockUser.profilePicture ? (
               <AvatarImage 
-                src={user.profilePicture} 
-                alt={user.displayName}
+                src={mockUser.profilePicture} 
+                alt={mockUser.displayName}
                 className="object-cover"
               />
             ) : (
               <AvatarFallback className="text-2xl">
-                {user.displayName.charAt(0)}
+                {mockUser.displayName.charAt(0)}
               </AvatarFallback>
             )}
           </Avatar>
@@ -36,7 +37,7 @@ export function ProfileHeader() {
             <Pencil className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-xl font-semibold">{user.displayName}</h2>
+        <h2 className="text-xl font-semibold">{mockUser.displayName}</h2>
         <p className="text-muted-foreground text-sm">Member since {memberSince}</p>
       </div>
       

@@ -1,41 +1,43 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Play, Trash } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { SavedContent } from "@shared/schema";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
 export function SavedContents() {
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   
-  const { data: savedContents, isLoading, error } = useQuery<SavedContent[]>({
-    queryKey: ["/api/saved-contents"],
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/saved-contents/${id}`);
+  // Mock data for UI development
+  const [savedContents, setSavedContents] = useState([
+    {
+      id: 1,
+      userId: 1,
+      contentId: "sermon123",
+      contentType: "video",
+      title: "Sunday Sermon: Faith and Patience",
+      thumbnail: "",
+      createdAt: new Date().toISOString()
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/saved-contents"] });
-      toast({
-        title: "Content removed",
-        description: "The saved content has been removed successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to remove content",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+    {
+      id: 2,
+      userId: 1,
+      contentId: "devotional456",
+      contentType: "article",
+      title: "Daily Devotional: Finding Peace in Chaos",
+      thumbnail: null,
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  ]);
 
   const handleRemove = (id: number) => {
-    deleteMutation.mutate(id);
+    setSavedContents(prev => prev.filter(item => item.id !== id));
+    toast({
+      title: "Content removed",
+      description: "The saved content has been removed successfully.",
+    });
   };
 
   if (isLoading) {
@@ -139,7 +141,6 @@ export function SavedContents() {
                   size="sm" 
                   className="text-xs gap-1"
                   onClick={() => handleRemove(content.id)}
-                  disabled={deleteMutation.isPending}
                 >
                   <Trash className="h-3 w-3" /> Remove
                 </Button>
