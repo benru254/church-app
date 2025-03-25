@@ -1,3 +1,14 @@
+/**
+ * Main application component that handles routing between different pages
+ * 
+ * The app uses wouter for routing and consists of the following main sections:
+ * - Authentication page (no layout)
+ * - Home page (dashboard)
+ * - Live streaming page
+ * - Community page (for testimonies, Q&A, prayer requests)
+ * - Giving page (for donations)
+ * - Profile page (user settings and saved content)
+ */
 import { Switch, Route, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
@@ -9,6 +20,10 @@ import GivingPage from "@/pages/giving-page";
 import ProfilePage from "@/pages/profile-page";
 import MainLayout from "./layouts/main-layout";
 
+/**
+ * Router component that defines all application routes
+ * Uses wouter's Switch and Route components for routing
+ */
 function Router() {
   return (
     <Switch>
@@ -23,10 +38,15 @@ function Router() {
   );
 }
 
+/**
+ * Main App component that conditionally renders the layout
+ * - Authentication page has no layout (just the Router)
+ * - All other pages use the MainLayout component
+ */
 function App() {
   const [location] = useLocation();
   
-  // Don't render the layout on the auth page
+  // Special case: Auth page doesn't use the main layout
   if (location === "/auth") {
     return (
       <>
@@ -36,6 +56,7 @@ function App() {
     );
   }
   
+  // All other pages use the MainLayout
   return (
     <>
       <MainLayout>

@@ -1,7 +1,23 @@
+/**
+ * User Context Provider
+ * 
+ * This module creates a context for user authentication and profile data.
+ * It provides a demonstration user with mock data for testing and development.
+ * 
+ * Features:
+ * - User authentication state (login/logout)
+ * - User profile data management
+ * - Activity tracking (donations, testimonies, etc.)
+ * - User preferences (notifications, theme, etc.)
+ * - Content saving functionality
+ */
 import { createContext, ReactNode, useContext, useState } from "react";
 import { SavedContent } from "@shared/schema";
 
-// Define the demo user profile
+/**
+ * DemoUser interface defines the structure of the user profile
+ * This is a comprehensive user model used throughout the app
+ */
 export type DemoUser = {
   id: number;
   username: string;
@@ -32,7 +48,10 @@ export type DemoUser = {
   };
 };
 
-// Mock saved content
+/**
+ * Mock data representing saved content for the demo user
+ * Used to populate the user's initial state
+ */
 const mockSavedContents: SavedContent[] = [
   {
     id: 1,
@@ -63,7 +82,10 @@ const mockSavedContents: SavedContent[] = [
   }
 ];
 
-// Create our demo user
+/**
+ * Default demo user profile with predefined values
+ * Used as the initial state for the user context
+ */
 const defaultUser: DemoUser = {
   id: 1,
   username: "grace_member",
@@ -91,6 +113,10 @@ const defaultUser: DemoUser = {
   }
 };
 
+/**
+ * UserContextType defines the shape of the context value
+ * Includes user data and methods for interacting with user state
+ */
 type UserContextType = {
   user: DemoUser;
   isLoggedIn: boolean;
@@ -101,22 +127,42 @@ type UserContextType = {
   incrementActivity: (activity: keyof DemoUser['activities']) => void;
 };
 
+// Create context with null as default value (will be set by provider)
 const UserContext = createContext<UserContextType | null>(null);
 
+/**
+ * UserProvider component wraps the application to provide user context
+ * @param children - Child components that will have access to the context
+ */
 export function UserProvider({ children }: { children: ReactNode }) {
+  // Initialize state with the default user and logged in for demo purposes
   const [user, setUser] = useState<DemoUser>(defaultUser);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Default to logged in for the demo
+  const [isLoggedIn, setIsLoggedIn] = useState(true);  // Default to logged in for the demo
 
+  /**
+   * Login function - currently just sets isLoggedIn to true
+   * In a real app, this would handle authentication with the backend
+   */
   const login = () => {
     setIsLoggedIn(true);
   };
 
+  /**
+   * Logout function - currently just sets isLoggedIn to false
+   * In a real app, this would clear tokens and session data
+   */
   const logout = () => {
     setIsLoggedIn(false);
   };
 
+  /**
+   * Toggle content saved status
+   * If content is already saved, removes it; otherwise adds it
+   * @param content - Content to toggle saved status
+   */
   const toggleSaveContent = (content: Omit<SavedContent, "id" | "userId" | "createdAt">) => {
     setUser(prevUser => {
+      // Check if content is already saved
       const isSaved = prevUser.savedContents.some(item => 
         item.contentType === content.contentType && item.contentId === content.contentId
       );
@@ -146,6 +192,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  /**
+   * Update a specific user preference
+   * @param key - The preference key to update
+   * @param value - The new boolean value
+   */
   const updatePreference = (key: keyof DemoUser['preferences'], value: boolean) => {
     setUser(prevUser => ({
       ...prevUser,
@@ -156,6 +207,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  /**
+   * Increment a specific user activity counter
+   * @param activity - The activity type to increment
+   */
   const incrementActivity = (activity: keyof DemoUser['activities']) => {
     setUser(prevUser => ({
       ...prevUser,
@@ -166,6 +221,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  // Provide the context value to children components
   return (
     <UserContext.Provider 
       value={{ 
@@ -183,6 +239,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Custom hook to access the user context
+ * Throws an error if used outside of a UserProvider
+ * @returns The user context value
+ */
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {

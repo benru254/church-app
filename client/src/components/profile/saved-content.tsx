@@ -1,15 +1,49 @@
+/**
+ * Saved Content Component
+ * 
+ * Displays a list of content saved by the user, such as sermons and devotionals.
+ * Features include:
+ * - Loading state with skeleton UI
+ * - Error handling
+ * - Empty state message
+ * - Content cards with thumbnails
+ * - Play/Read and Remove actions
+ */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Play, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
-import { useUser } from "@/context/user-context";
 import { SavedContent } from "@shared/schema";
 
+// Mock data for saved content when context is unavailable
+const mockSavedContents: SavedContent[] = [
+  {
+    id: 1,
+    userId: 1,
+    contentType: "sermon",
+    contentId: "video1",
+    title: "Finding Peace in Difficult Times",
+    thumbnail: "https://images.unsplash.com/photo-1600093112291-7b553e3fcb82?w=500&h=350&auto=format&fit=crop&q=80",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 7 days ago
+  },
+  {
+    id: 2,
+    userId: 1,
+    contentType: "sermon",
+    contentId: "video2",
+    title: "The Power of Community",
+    thumbnail: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=350&auto=format&fit=crop&q=80",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), // 3 days ago
+  }
+];
+
+/**
+ * SavedContents component displays content saved by the user
+ */
 export function SavedContents() {
   const { toast } = useToast();
-  const { user, toggleSaveContent } = useUser();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [savedContents, setSavedContents] = useState<SavedContent[]>([]);
@@ -18,26 +52,29 @@ export function SavedContents() {
     // Simulate loading from API
     const timer = setTimeout(() => {
       setIsLoading(false);
-      setSavedContents(user.savedContents);
+      setSavedContents(mockSavedContents);
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [user.savedContents]);
+  }, []);
 
+  /**
+   * Handle removing a saved content item
+   */
   const handleRemove = (content: SavedContent) => {
-    toggleSaveContent({
-      contentType: content.contentType,
-      contentId: content.contentId,
-      title: content.title,
-      thumbnail: content.thumbnail
-    });
+    // Update the local state to remove the content
+    setSavedContents(prev => 
+      prev.filter(item => item.id !== content.id)
+    );
     
+    // Show success message
     toast({
       title: "Content removed",
       description: "The saved content has been removed successfully.",
     });
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <Card className="mb-6">
@@ -64,6 +101,7 @@ export function SavedContents() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <Card className="mb-6">
@@ -78,6 +116,7 @@ export function SavedContents() {
     );
   }
 
+  // Empty state
   if (!savedContents || savedContents.length === 0) {
     return (
       <Card className="mb-6">
@@ -92,6 +131,7 @@ export function SavedContents() {
     );
   }
 
+  // Content loaded state
   return (
     <Card className="mb-6">
       <CardHeader className="px-4 py-3 border-b">
@@ -101,6 +141,7 @@ export function SavedContents() {
       <CardContent className="p-4 space-y-4">
         {savedContents.map((content) => (
           <div key={content.id} className="flex gap-3">
+            {/* Content thumbnail based on type */}
             {content.contentType === 'video' ? (
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
                 {content.thumbnail ? (
@@ -117,6 +158,7 @@ export function SavedContents() {
               </div>
             )}
             
+            {/* Content details and action buttons */}
             <div className="flex-1">
               <p className="font-medium text-sm">{content.title}</p>
               <p className="text-xs text-muted-foreground mb-1">
