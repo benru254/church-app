@@ -74,7 +74,7 @@ export function DrawerNavigation() {
           <span className="sr-only">Open menu</span>
         </Button>
       </DrawerTrigger>
-      <DrawerContent side="left" className="w-[280px] h-full">
+      <DrawerContent className="w-[280px] h-full">
         <DrawerHeader className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Avatar>
