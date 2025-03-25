@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, MessageSquare, Share, MoreVertical, HandHelping } from "lucide-react";
+import { Heart, MessageSquare, Share, MoreVertical, HandHelping, User } from "lucide-react";
 import { Testimony } from "@shared/schema";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -17,9 +16,59 @@ interface EnrichedTestimony extends Testimony {
 }
 
 export function TestimoniesFeed() {
-  const { data: testimonies, isLoading, error } = useQuery<EnrichedTestimony[]>({
-    queryKey: ["/api/testimonies"],
-  });
+  // Mock testimonies data
+  const mockTestimonies: EnrichedTestimony[] = [
+    {
+      id: 1,
+      userId: 1,
+      content: "I was diagnosed with a serious illness last year, but after many prayers, my latest test results came back clear. God is so good!",
+      isAnonymous: false,
+      imageUrl: "https://images.unsplash.com/photo-1508939029959-5a1f231939f5?w=800&h=600&auto=format&fit=crop&q=80",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+      user: {
+        id: 1,
+        displayName: "Sarah Johnson",
+        profilePicture: "https://randomuser.me/api/portraits/women/32.jpg"
+      }
+    },
+    {
+      id: 2,
+      userId: 2,
+      content: "After years of trying, my wife and I are finally expecting our first child. We've been praying for this blessing for so long!",
+      isAnonymous: false,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
+      user: {
+        id: 2,
+        displayName: "Michael Thompson",
+        profilePicture: "https://randomuser.me/api/portraits/men/41.jpg"
+      }
+    },
+    {
+      id: 3,
+      userId: 3, 
+      content: "I lost my job during the pandemic and was struggling financially. A member of our church anonymously paid my rent for three months while I found a new job. God provides!",
+      isAnonymous: true,
+      createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+      user: {
+        id: 3,
+        displayName: "Anonymous User"
+      }
+    }
+  ];
+
+  // Simulate loading state for 1 second
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [testimonies, setTestimonies] = useState<EnrichedTestimony[]>([]);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTestimonies(mockTestimonies);
+      setIsLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const [reactionsMap, setReactionsMap] = useState<Record<number, { count: number, reacted: boolean }>>({});
 

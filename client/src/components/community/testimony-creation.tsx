@@ -3,42 +3,39 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Image, Video, SmilePlus, User } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-import { useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Image, Video, SmilePlus, User, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function TestimonyCreation() {
-  const { user } = useAuth();
+  // Mock user data
+  const mockUser = {
+    displayName: "John Doe",
+    profilePicture: ""
+  };
+  
   const { toast } = useToast();
   const [content, setContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createTestimonyMutation = useMutation({
-    mutationFn: async (data: { content: string; isAnonymous: boolean; imageUrl?: string }) => {
-      const response = await apiRequest("POST", "/api/testimonies", data);
-      return response.json();
-    },
-    onSuccess: () => {
+  // Mock testimony creation functionality
+  const handleTestimonyCreation = () => {
+    setIsSubmitting(true);
+    
+    // Simulate API call delay
+    setTimeout(() => {
       setContent("");
       setIsAnonymous(false);
       setImageUrl(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/testimonies"] });
+      setIsSubmitting(false);
+      
       toast({
         title: "Testimony shared",
         description: "Your testimony has been shared successfully!",
       });
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to share testimony",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+    }, 1000);
+  };
 
   const handleSubmit = () => {
     if (!content.trim()) {
@@ -50,11 +47,7 @@ export function TestimonyCreation() {
       return;
     }
 
-    createTestimonyMutation.mutate({
-      content,
-      isAnonymous,
-      imageUrl: imageUrl || undefined,
-    });
+    handleTestimonyCreation();
   };
 
   return (
@@ -62,10 +55,10 @@ export function TestimonyCreation() {
       <CardContent className="p-4">
         <div className="flex items-center gap-3 mb-3">
           <Avatar>
-            {user?.profilePicture ? (
-              <AvatarImage src={user.profilePicture} alt={user.displayName} />
+            {mockUser.profilePicture ? (
+              <AvatarImage src={mockUser.profilePicture} alt={mockUser.displayName} />
             ) : (
-              <AvatarFallback>{user?.displayName.charAt(0) || "U"}</AvatarFallback>
+              <AvatarFallback>{mockUser.displayName.charAt(0) || "U"}</AvatarFallback>
             )}
           </Avatar>
           <div className="flex-1">
@@ -116,9 +109,9 @@ export function TestimonyCreation() {
             <Button 
               size="sm" 
               onClick={handleSubmit}
-              disabled={createTestimonyMutation.isPending || !content.trim()}
+              disabled={isSubmitting || !content.trim()}
             >
-              Share
+              {isSubmitting ? "Sharing..." : "Share"}
             </Button>
           </div>
         </div>
