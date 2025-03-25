@@ -3,37 +3,35 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Play, Trash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@/context/user-context";
+import { SavedContent } from "@shared/schema";
 
 export function SavedContents() {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, toggleSaveContent } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [savedContents, setSavedContents] = useState<SavedContent[]>([]);
   
-  // Mock data for UI development
-  const [savedContents, setSavedContents] = useState([
-    {
-      id: 1,
-      userId: 1,
-      contentId: "sermon123",
-      contentType: "video",
-      title: "Sunday Sermon: Faith and Patience",
-      thumbnail: "",
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      userId: 1,
-      contentId: "devotional456",
-      contentType: "article",
-      title: "Daily Devotional: Finding Peace in Chaos",
-      thumbnail: null,
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-    }
-  ]);
+  useEffect(() => {
+    // Simulate loading from API
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setSavedContents(user.savedContents);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [user.savedContents]);
 
-  const handleRemove = (id: number) => {
-    setSavedContents(prev => prev.filter(item => item.id !== id));
+  const handleRemove = (content: SavedContent) => {
+    toggleSaveContent({
+      contentType: content.contentType,
+      contentId: content.contentId,
+      title: content.title,
+      thumbnail: content.thumbnail
+    });
+    
     toast({
       title: "Content removed",
       description: "The saved content has been removed successfully.",
@@ -140,7 +138,7 @@ export function SavedContents() {
                   variant="outline" 
                   size="sm" 
                   className="text-xs gap-1"
-                  onClick={() => handleRemove(content.id)}
+                  onClick={() => handleRemove(content)}
                 >
                   <Trash className="h-3 w-3" /> Remove
                 </Button>
